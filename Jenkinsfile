@@ -37,6 +37,18 @@ pipeline {
                     sh '''
                         JAR_FILE=$(ls target/*.jar | grep -v original | head -n 1)
 
+                        cat > settings.xml <<EOF
+<settings>
+  <servers>
+    <server>
+      <id>nexus</id>
+      <username>${NEXUS_USER}</username>
+      <password>${NEXUS_PASS}</password>
+    </server>
+  </servers>
+</settings>
+EOF
+
                         mvn deploy:deploy-file \
                           -DgroupId=com.githubhw6 \
                           -DartifactId=github-hw6 \
@@ -46,8 +58,7 @@ pipeline {
                           -DrepositoryId=nexus \
                           -Durl=http://nexus:8081/repository/maven-releases/ \
                           -DgeneratePom=true \
-                          -Dusername=$NEXUS_USER \
-                          -Dpassword=$NEXUS_PASS
+                          -s settings.xml
                     '''
                 }
             }
